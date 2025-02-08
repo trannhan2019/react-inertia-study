@@ -12,15 +12,52 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import AddModal from "./AddModal";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Link } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function Post({ posts }) {
     const [openAdd, setOpenAdd] = useState(false);
+
     const handleOpenAdd = () => {
         setOpenAdd(true);
     };
     const handleCloseAdd = () => {
         setOpenAdd(false);
     };
+
+    const handlePerPageChange = (pageSize) => {
+        router.get(route("post.index"), { page_size: pageSize });
+    };
+
+    const makeLabel = (label) => {
+        if (label.includes("Previous")) {
+            return "<";
+        } else if (label.includes("Next")) {
+            return ">";
+        } else {
+            return label;
+        }
+    };
+
+    console.log(posts);
 
     return (
         <AuthenticatedLayout
@@ -54,7 +91,7 @@ export default function Post({ posts }) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {posts.map((post) => (
+                                {posts.data.map((post) => (
                                     <TableRow key={post.id}>
                                         <TableCell className="font-medium">
                                             {post.id}
@@ -68,14 +105,77 @@ export default function Post({ posts }) {
                                 ))}
                             </TableBody>
                             <TableFooter>
-                                <TableRow>
-                                    <TableCell colSpan={3}>Total</TableCell>
-                                    <TableCell className="text-right">
-                                        $2,500.00
-                                    </TableCell>
-                                </TableRow>
+                                <TableRow></TableRow>
                             </TableFooter>
                         </Table>
+
+                        <div className="flex justify-end">
+                            <p className="text-slate-600 dark:text-slate-400 text-sm">
+                                Showing {posts.from} to {posts.to} of{" "}
+                                {posts.total} results
+                            </p>
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            as="button"
+                                            disabled={posts.current_page === 1}
+                                            href={posts.first_page_url}
+                                            isActive={posts.current_page === 1}
+                                        >
+                                            {"<<"}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                    {posts.links.map((link) => (
+                                        <PaginationItem key={link.label}>
+                                            <PaginationLink
+                                                as="button"
+                                                href={link.url}
+                                                isActive={link.active}
+                                                disabled={link.url === null}
+                                            >
+                                                {makeLabel(link.label)}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            as="button"
+                                            href={posts.last_page_url}
+                                            isActive={
+                                                posts.current_page ===
+                                                posts.last_page
+                                            }
+                                            disabled={
+                                                posts.current_page ===
+                                                posts.last_page
+                                            }
+                                        >
+                                            {">>"}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+
+                            <Select
+                                onValueChange={handlePerPageChange}
+                                defaultValue={posts.per_page}
+                            >
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select per page" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>
+                                            Choose per page
+                                        </SelectLabel>
+                                        <SelectItem value={5}>05</SelectItem>
+                                        <SelectItem value={10}>10</SelectItem>
+                                        <SelectItem value={20}>20</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
             </div>

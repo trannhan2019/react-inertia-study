@@ -10,10 +10,14 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::latest()->get();
-        return inertia('Post/Index', compact('posts'));
+        $pageSize = $request->input('page_size', 5);
+        $posts = Post::latest()->paginate($pageSize)->withQueryString();
+        return inertia('Post/Index',
+        [
+            'posts' => $posts
+        ]);
     }
 
     /**
@@ -29,6 +33,10 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+        ]);
         Post::create($request->all());
         // return redirect()->route('post.index');
         return to_route('post.index');

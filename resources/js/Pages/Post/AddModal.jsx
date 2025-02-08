@@ -10,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "@inertiajs/react";
+import InputError from "@/Components/InputError";
+import { toast } from "react-toastify";
 
 export default function AddModal({ open, onClose }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -20,9 +22,10 @@ export default function AddModal({ open, onClose }) {
     function submit(e) {
         e.preventDefault();
         post(route("post.store"), {
-            onFinish: () => {
+            onSuccess: () => {
                 reset("title", "body");
                 onClose();
+                toast.success("Post created successfully");
             },
         });
     }
@@ -56,6 +59,12 @@ export default function AddModal({ open, onClose }) {
                                     setData("title", e.target.value)
                                 }
                             />
+                            {errors.title && (
+                                <InputError
+                                    message={errors.title}
+                                    className="col-span-3 text-center"
+                                />
+                            )}
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="body" className="text-right">
@@ -69,6 +78,12 @@ export default function AddModal({ open, onClose }) {
                                     setData("body", e.target.value)
                                 }
                             />
+                            {errors.body && (
+                                <InputError
+                                    message={errors.body}
+                                    className="col-span-3 text-center"
+                                />
+                            )}
                         </div>
                     </div>
                     <DialogFooter>
