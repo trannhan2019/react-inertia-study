@@ -12,26 +12,9 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import AddModal from "./AddModal";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Link } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+
+import PaginationComponent from "@/Components/PaginationComponent";
+import SearchForm from "./SearchForm";
 
 export default function Post({ posts }) {
     const [openAdd, setOpenAdd] = useState(false);
@@ -43,21 +26,7 @@ export default function Post({ posts }) {
         setOpenAdd(false);
     };
 
-    const handlePerPageChange = (pageSize) => {
-        router.get(route("post.index"), { page_size: pageSize });
-    };
-
-    const makeLabel = (label) => {
-        if (label.includes("Previous")) {
-            return "<";
-        } else if (label.includes("Next")) {
-            return ">";
-        } else {
-            return label;
-        }
-    };
-
-    console.log(posts);
+    // console.log(posts);
 
     return (
         <AuthenticatedLayout
@@ -66,6 +35,7 @@ export default function Post({ posts }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Post
                     </h2>
+                    <SearchForm />
                     <Button onClick={handleOpenAdd}>Add Post</Button>
                 </div>
             }
@@ -109,73 +79,14 @@ export default function Post({ posts }) {
                             </TableFooter>
                         </Table>
 
-                        <div className="flex justify-end">
-                            <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                Showing {posts.from} to {posts.to} of{" "}
-                                {posts.total} results
-                            </p>
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationLink
-                                            as="button"
-                                            disabled={posts.current_page === 1}
-                                            href={posts.first_page_url}
-                                            isActive={posts.current_page === 1}
-                                        >
-                                            {"<<"}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    {posts.links.map((link) => (
-                                        <PaginationItem key={link.label}>
-                                            <PaginationLink
-                                                as="button"
-                                                href={link.url}
-                                                isActive={link.active}
-                                                disabled={link.url === null}
-                                            >
-                                                {makeLabel(link.label)}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    ))}
-                                    <PaginationItem>
-                                        <PaginationLink
-                                            as="button"
-                                            href={posts.last_page_url}
-                                            isActive={
-                                                posts.current_page ===
-                                                posts.last_page
-                                            }
-                                            disabled={
-                                                posts.current_page ===
-                                                posts.last_page
-                                            }
-                                        >
-                                            {">>"}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-
-                            <Select
-                                onValueChange={handlePerPageChange}
-                                defaultValue={posts.per_page}
-                            >
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Select per page" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>
-                                            Choose per page
-                                        </SelectLabel>
-                                        <SelectItem value={5}>05</SelectItem>
-                                        <SelectItem value={10}>10</SelectItem>
-                                        <SelectItem value={20}>20</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <PaginationComponent
+                            links={posts.links}
+                            info={{
+                                from: posts.from,
+                                to: posts.to,
+                                total: posts.total,
+                            }}
+                        />
                     </div>
                 </div>
             </div>

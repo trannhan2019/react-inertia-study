@@ -12,11 +12,17 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $pageSize = $request->input('page_size', 5);
-        $posts = Post::latest()->paginate($pageSize)->withQueryString();
+        $filters = $request->only(['search']);
+        $pageSize = $request->input('page_size', 10);
+        $posts = Post::filter($filters)
+            ->latest()
+            ->paginate($pageSize)
+            ->withQueryString();
         return inertia('Post/Index',
         [
-            'posts' => $posts
+            'posts' => $posts,
+            'search' => $request->search,
+            'page_size' => $pageSize
         ]);
     }
 

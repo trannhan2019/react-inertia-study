@@ -1,4 +1,5 @@
 -- pagination with route
 -- action edit, delete
+-- upload image
 
 -- hoc cac khai niem inertia voi AI
